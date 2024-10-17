@@ -9,7 +9,7 @@ services:
     build:
       context: .
     ports:
-      - "8000:8000"
+      - "5000:5000"
   nginx:
     build: ./nginx
     volumes:
@@ -23,5 +23,41 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  celery:
+    build:
+      context: .
+    command: celery -A book_service worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - django_gunicorn
+      - redis
+      - rabbitmq
+
+  celery_beat:
+    build:
+      context: .
+    command: celery -A book_service beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - django_gunicorn
+      - redis
+      - rabbitmq
+
 volumes:
   static:
