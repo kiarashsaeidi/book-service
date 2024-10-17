@@ -1,6 +1,5 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .services import cache_book_data, fetch_book_data, get_book_cached
-
 
 def bookDetail(request, id):
     if request.method == 'GET':
@@ -23,3 +22,6 @@ def bookDetail(request, id):
 
 
         return JsonResponse({'error': 'Book not found'}, status=404)
+
+def test(request):
+    return HttpResponse("result.id")
